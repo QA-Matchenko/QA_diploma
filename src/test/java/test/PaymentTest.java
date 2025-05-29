@@ -3,10 +3,7 @@ package test;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import data.PageForm;
 import io.qameta.allure.selenide.AllureSelenide;
-import org.apache.commons.dbutils.DbUtils;
 import org.junit.jupiter.api.*;
-
-import java.awt.print.PageFormat;
 
 class PaymentTest {
     @BeforeEach
@@ -20,7 +17,7 @@ class PaymentTest {
     }
 
     @AfterEach
-    void clearAll() {
+     void clearAll() {
         clearAll();
     }
     @AfterAll
@@ -29,14 +26,442 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment")
+    @DisplayName("ApprovedCardPayment,valid info")
      void shouldPayByApprovedCard() {
         PageForm.byuOnMoney();
         PageForm.setCardNumber("4444444444444441");
-        PageForm.setCardMonth("08");
+        PageForm.setCardMonth("07");
         PageForm.setCardYear("25");
-        PageForm.setCardOwner("Maria Ivanova");
-        PageForm.setCardCVV("999");
-        PageForm.pushСontinueButton();
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.successfulPageFilling();
+    }
+
+    @Test
+    @DisplayName("UnapprovedCardPayment,valid info")
+    void shouldPayByDeclinedCard() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("4444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+
+    @Test
+    @DisplayName("ApprovedCardPayment,not enough card numbers")
+    void shouldPayByInvalidCardNumbers1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment,not enough card numbers")
+    void shouldPayByInvalidCardNumbers2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+
+    @Test
+    @DisplayName("ApprovedCardPayment,add any symbols")
+    void shouldPayByInvalidCardSymbols1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("X444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment,add any symbols")
+    void shouldPayByInvalidCardSymbols2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("X444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment,too many card numbers")
+    void shouldPayByTooManyCardNumbers1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("4444444444444413");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment,too many card numbers")
+    void shouldPayByTooManyCardNumbers2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("4444444444444423");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment,empty card numbers")
+    void shouldPayByEmptyCardNumbers1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment,empty card numbers")
+    void shouldPayByEmptyCardNumbers2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardWrongFormat();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, 00 in months")
+    void shouldPayBy00InMonth1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("00");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.dateWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, 00 in months")
+    void shouldPayBy00InMonth2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("00");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.dateWrongFormat();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, 13 in months")
+    void shouldPayBy13InMonth1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("13");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.dateWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, 13 in months")
+    void shouldPayBy13InMonth2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("13");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.dateWrongFormat();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, empty in months")
+    void shouldPayByEmptyInMonth1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.dateWrongFormat();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, empty in months")
+    void shouldPayByEmptyInMonth2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.dateWrongFormat();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, 00 in year")
+    void shouldPayBy00InYear1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("00");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, 00 in year")
+    void shouldPayBy00InYear2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("00");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, 24 in year")
+    void shouldPayBy24InYear1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("24");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+
+    @Test
+    @DisplayName("DeclinedCardPayment, 24 in year")
+    void shouldPayBy24InYear2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("24");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+
+    @Test
+    @DisplayName("ApprovedCardPayment, 26 in year")
+    void shouldPayBy26InYear1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("26");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+
+    @Test
+    @DisplayName("DeclinedCardPayment, 26 in year")
+    void shouldPayBy26InYear2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("26");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+
+    @Test
+    @DisplayName("ApprovedCardPayment,empty in year")
+    void shouldPayByEmptyInYear1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment,empty in year")
+    void shouldPayByEmptyInYear2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.cardExpiration();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, Cyrillic script in CardOwner")
+    void shouldPayByCyrillic1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Иван Иванов");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, Cyrillic script in CardOwner")
+    void shouldPayByCyrillic2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444442");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Иван Иванов");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, add any symbols in CardOwner")
+    void shouldPayByAnySymbols1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Иван O8J9O");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, add any symbols in CardOwner")
+    void shouldPayByAnySymbols2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Иван O8J9O");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment,empty in CardOwner")
+    void shouldPayByEmpty1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, empty in CardOwner")
+    void shouldPayByEmpty2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("");
+        PageForm.setCardCVV("123");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, 1000 in CVC/CVV")
+    void shouldPayBy1000CVCCVV1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("1000");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, 1000 in CVC/CVV")
+    void shouldPayBy1000CVCCVV2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("1000");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment,1234 in CVC/CVV")
+    void shouldPayBy1234CVCCVV1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("1234");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment,1234 in CVC/CVV")
+    void shouldPayBy1234CVCCVV2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("1234");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("ApprovedCardPayment, empty in CVC/CVV")
+    void shouldPayByEmptyCVCCVV1() {
+        PageForm.byuOnMoney();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
+    }
+    @Test
+    @DisplayName("DeclinedCardPayment, 1000 in CVC/CVV")
+    void shouldPayByEmptyCVCCVV2() {
+        PageForm.byuOnCredit();
+        PageForm.setCardNumber("444444444444441");
+        PageForm.setCardMonth("07");
+        PageForm.setCardYear("25");
+        PageForm.setCardOwner("Ivan Ivanov");
+        PageForm.setCardCVV("");
+        PageForm.pushContinueButton();
+        PageForm.unSuccessfulPageFilling();
     }
 }

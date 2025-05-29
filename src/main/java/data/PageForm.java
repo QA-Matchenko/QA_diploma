@@ -1,6 +1,5 @@
 package data;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selectors;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
@@ -31,7 +30,6 @@ public class PageForm {
         SelenideElement cardHolderField = $(By.name("card_holder"));
         SelenideElement cvcField = $(By.name("cvc"));
 
-
         $("button[type='submit']").click();
     }
 
@@ -41,37 +39,38 @@ public class PageForm {
         $$(".theme_alfa").find(exactText("Оплата по карте")).shouldBe(visible);
 
     }
-    public void byuOnCredit() {
+
+    public static void byuOnCredit() {
         open(appURL + ":" + appGate);
         $$(".button_content").find(exactText("Купить в кредит")).click();
         $$(".theme_alfa").find(exactText("Кредит по данным карты")).shouldBe(visible);
 
     }
 
-
-    public void CardWrongFormat(){
+    public static void cardWrongFormat() {
         $$(".input__sub").find(exactText("Неверный формат")).shouldBe(visible);
     }
 
-    public void DateWrongFormat(){
+
+    public static void dateWrongFormat() {
         $$(".input__sub").find(exactText("Неверно указан срок действия карты")).shouldBe(visible);
     }
 
-    public void CardExpiration(){
+    public static void cardExpiration() {
         $$(".input__sub").find(exactText("Истек срок действия карты")).shouldBe(visible);
 
     }
 
-    public void successfulPageFilling(){
+    public static void successfulPageFilling() {
         $(Selectors.withText("Операция одобрена банком")).shouldBe(visible);
     }
 
 
-    public void unSuccessfulPageFilling(){
+    public static void unSuccessfulPageFilling() {
         $(Selectors.withText("Ошибка")).shouldBe(visible, Duration.ofSeconds(15));
     }
 
-    public void ContinuePageFilling(){
+    public void continuePageFilling() {
         $$(".button_content").find(exactText("Продолжить")).click();
     }
 
@@ -94,7 +93,8 @@ public class PageForm {
     public static void setCardCVV(String cCvv) {
         cvcOrCvvNumber.setValue(cCvv);
     }
-    public static void pushСontinueButton() {
+
+    public static void pushContinueButton() {
         $$(".button__content").find(exactText("Продолжить")).click();
     }
 }
