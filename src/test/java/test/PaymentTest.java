@@ -22,7 +22,7 @@ class PaymentTest {
 
     @AfterEach
      void clearAll() {
-        DBUtils.clearAllData();
+        dbutils.clearAllData();
     }
     @AfterAll
     static void tearDownAll() {
