@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 
 import java.sql.DriverManager;
 
-public class dbutils {
+public class DBUtils {
     private static String url = System.getProperty("db.url");
     private static String userDB = System.getProperty("app.userDB");
     private static String password = System.getProperty("app.password");

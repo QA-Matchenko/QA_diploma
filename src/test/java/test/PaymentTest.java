@@ -2,13 +2,13 @@ package test;
 
 import com.codeborne.selenide.logevents.SelenideLogger;
 import data.PageForm;
-import data.dbutils;
+import data.DBUtils;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
 
 class PaymentTest {
     private PageForm PageForm;
-    private dbutils DBUtils;
+
 
     @BeforeEach
     void setUpPage() {
@@ -22,7 +22,7 @@ class PaymentTest {
 
     @AfterEach
      void clearAll() {
-        dbutils.clearAllData();
+        DBUtils.clearAllData();
     }
     @AfterAll
     static void tearDownAll() {
