@@ -6,7 +6,7 @@ build/
 data/
 .data
 /.data
-
+/node_modules/
 
 
 ### STS ###
