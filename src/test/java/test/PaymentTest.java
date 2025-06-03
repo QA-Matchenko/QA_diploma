@@ -2,6 +2,7 @@ package test;
 
 import com.codeborne.selenide.logevents.SelenideLogger;
 import data.DBUtils;
+import data.DataHelper;
 import data.Status;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
@@ -11,13 +12,12 @@ import page.PageForm;
 
 
 public class PaymentTest {
-    private PageForm pageForm;
 
     @BeforeEach
     void setUpPage() {
         String appUrl = "http://localhost";
         int appPort = 8080;
-        pageForm = new PageForm(appUrl + ":" + appPort);
+        PageForm pageForm = new PageForm(appUrl + ":" + appPort);
     }
 
 
@@ -34,6 +34,33 @@ public class PaymentTest {
     @AfterAll
     static void tearDownAll() {
         SelenideLogger.removeAllListeners();
+    }
+    @Test
+    @DisplayName("Payment with approved card, database check")
+    void showPayAndEntryDB() {
+        PageForm.buyOnMoney();
+        PageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        PageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        PageForm.setCardYear(DataHelper.generateRandomValidYear());
+        PageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        PageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        PageForm.pushContinueButton();
+        PageForm.successfulPageFilling();
+        DBUtils.checkPaymentStatus(Status.APPROVED);
+    }
+
+    @Test
+    @DisplayName("Payment with declined card, database check")
+    void shouldNoPayByDeclinedCardStatusInDB() {
+        PageForm.buyOnCredit();
+        PageForm.setCardNumber(DataHelper.generateDeclinedCardNumber());
+        PageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        PageForm.setCardYear(DataHelper.generateRandomValidYear());
+        PageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        PageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        PageForm.pushContinueButton();
+        PageForm.successfulPageFilling();
+        DBUtils.checkPaymentStatus(Status.DECLINED);
     }
 
     @Test
