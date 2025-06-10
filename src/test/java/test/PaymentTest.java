@@ -6,12 +6,12 @@ import data.DataHelper;
 import data.Status;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import page.PageForm;
 
 
 public class PaymentTest {
+
+    private PageForm pageForm;
 
     @BeforeEach
     void setUpPage() {
@@ -31,504 +31,245 @@ public class PaymentTest {
         DBUtils.clearAllData();
     }
 
+
     @AfterAll
     static void tearDownAll() {
-        SelenideLogger.removeAllListeners();
+        SelenideLogger.removeListener("allure");
     }
+
     @Test
     @DisplayName("Payment with approved card, database check")
-    void showPayAndEntryDB() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
-        PageForm.setCardMonth(DataHelper.generateRandomValidMonth());
-        PageForm.setCardYear(DataHelper.generateRandomValidYear());
-        PageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
-        PageForm.setCardCVV(DataHelper.generateRandomValidCVV());
-        PageForm.pushContinueButton();
-        PageForm.successfulPageFilling();
+    void shouldPayAndEntryDB() {
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.successfulPageFilling();
         DBUtils.checkPaymentStatus(Status.APPROVED);
     }
 
     @Test
     @DisplayName("Payment with declined card, database check")
-    void shouldNoPayByDeclinedCardStatusInDB() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber(DataHelper.generateDeclinedCardNumber());
-        PageForm.setCardMonth(DataHelper.generateRandomValidMonth());
-        PageForm.setCardYear(DataHelper.generateRandomValidYear());
-        PageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
-        PageForm.setCardCVV(DataHelper.generateRandomValidCVV());
-        PageForm.pushContinueButton();
-        PageForm.successfulPageFilling();
+    void shouldPayByDeclinedCardStatusInDB() {
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateDeclinedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.unSuccessfulPageFilling();
         DBUtils.checkPaymentStatus(Status.DECLINED);
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment,valid info")
-    void shouldPayByApprovedCard() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("4444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.successfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("UnapprovedCardPayment,valid info")
-    void shouldPayByDeclinedCard() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("4444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-
-    }
-
-    @Test
-    @DisplayName("ApprovedCardPayment,not enough card numbers")
-    void shouldPayByInvalidCardNumbers1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment,not enough card numbers")
+    @DisplayName("CardPayment, invalid card number")
     void shouldPayByInvalidCardNumbers2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateInvalidCardNumberWithLettersOrSymbols());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.cardWrongFormat();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment,add any symbols")
-    void shouldPayByInvalidCardSymbols1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("X444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
+    @DisplayName("CardPayment,not enough card numbers")
+    void shouldPayByNotEnoughCardNumbers2() {
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateInvalidCardNumberWithShortLength());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.cardWrongFormat();
     }
 
     @Test
-    @DisplayName("DeclinedCardPayment,add any symbols")
-    void shouldPayByInvalidCardSymbols2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("X444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
-    }
-
-    @Test
-    @DisplayName("ApprovedCardPayment,too many card numbers")
-    void shouldPayByTooManyCardNumbers1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("4444444444444413");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment,too many card numbers")
+    @DisplayName("CardPayment,too many card numbers")
     void shouldPayByTooManyCardNumbers2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("4444444444444423");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateInvalidCardNumberWithLongLength());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.unSuccessfulPageFilling();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment,empty card numbers")
-    void shouldPayByEmptyCardNumbers1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment,empty card numbers")
+    @DisplayName("CardPayment,empty card numbers")
     void shouldPayByEmptyCardNumbers2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardWrongFormat();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateEmptyCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.cardWrongFormat();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, 00 in months")
-    void shouldPayBy00InMonth1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("00");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.dateWrongFormat();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, 00 in months")
+    @DisplayName("CardPayment, 00 in months")
     void shouldPayBy00InMonth2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("00");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.dateWrongFormat();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateInvalidMonthZero());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.dateWrongFormat();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, 13 in months")
-    void shouldPayBy13InMonth1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("13");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.dateWrongFormat();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, 13 in months")
+    @DisplayName("CardPayment, 13 in months")
     void shouldPayBy13InMonth2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("13");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.dateWrongFormat();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateInvalidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.dateWrongFormat();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, empty in months")
-    void shouldPayByEmptyInMonth1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.dateWrongFormat();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, empty in months")
+    @DisplayName("CardPayment, empty in months")
     void shouldPayByEmptyInMonth2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.dateWrongFormat();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateEmptyString());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.dateWrongFormat();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, 00 in year")
+    @DisplayName("CardPayment, 00 in year")
     void shouldPayBy00InYear1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("00");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateInvalidYearZero());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.cardExpiration();
     }
 
     @Test
-    @DisplayName("DeclinedCardPayment, 00 in year")
-    void shouldPayBy00InYear2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("00");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
+    @DisplayName("CardPayment, Invalid in year")
+    void shouldPayByInvalidInYear2() {
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateExpiredYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.cardExpiration();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, 24 in year")
-    void shouldPayBy24InYear1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("24");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, 24 in year")
-    void shouldPayBy24InYear2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("24");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
-    }
-
-    @Test
-    @DisplayName("ApprovedCardPayment, 26 in year")
-    void shouldPayBy26InYear1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("26");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, 26 in year")
-    void shouldPayBy26InYear2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("26");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
-    }
-
-    @Test
-    @DisplayName("ApprovedCardPayment,empty in year")
-    void shouldPayByEmptyInYear1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment,empty in year")
+    @DisplayName("CardPayment,empty in year")
     void shouldPayByEmptyInYear2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.cardExpiration();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateEmptyString());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.cardWrongFormat();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, Cyrillic script in CardOwner")
-    void shouldPayByCyrillic1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Иван Иванов");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, Cyrillic script in CardOwner")
+    @DisplayName("CardPayment, Cyrillic script in CardOwner")
     void shouldPayByCyrillic2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444442");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Иван Иванов");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner("Иван Иванов");
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.unSuccessfulPageFilling();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, add any symbols in CardOwner")
-    void shouldPayByAnySymbols1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Иван O8J9O");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, add any symbols in CardOwner")
+    @DisplayName("CardPayment, add any symbols in CardOwner")
     void shouldPayByAnySymbols2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Иван O8J9O");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner("Иван O8J9O");
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.unSuccessfulPageFilling();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment,empty in CardOwner")
-    void shouldPayByEmpty1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, empty in CardOwner")
+    @DisplayName("CardPayment, empty in CardOwner")
     void shouldPayByEmpty2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("");
-        PageForm.setCardCVV("123");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateEmptyString());
+        pageForm.setCardCVV(DataHelper.generateRandomValidCVV());
+        pageForm.pushContinueButton();
+        pageForm.unSuccessfulPageFilling();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment, 1000 in CVC/CVV")
-    void shouldPayBy1000CVCCVV1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("1000");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, 1000 in CVC/CVV")
+    @DisplayName("CardPayment, 1000 in CVC/CVV")
     void shouldPayBy1000CVCCVV2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("1000");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateBoundaryFourDigitCVV());
+        pageForm.pushContinueButton();
+        pageForm.successfulPageFilling();
     }
 
     @Test
-    @DisplayName("ApprovedCardPayment,1234 in CVC/CVV")
-    void shouldPayBy1234CVCCVV1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("1234");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
+    @DisplayName("CardPayment, 4 numbers in CVC/CVV")
+    void shouldPayBy4NumbersCVCCVV2() {
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateFourDigitsCVV());
+        pageForm.pushContinueButton();
+        pageForm.successfulPageFilling();
     }
 
     @Test
-    @DisplayName("DeclinedCardPayment,1234 in CVC/CVV")
-    void shouldPayBy1234CVCCVV2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("1234");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("ApprovedCardPayment, empty in CVC/CVV")
+    @DisplayName("CardPayment, empty in CVC/CVV")
     void shouldPayByEmptyCVCCVV1() {
-        PageForm.buyOnMoney();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
-    }
-
-    @Test
-    @DisplayName("DeclinedCardPayment, 1000 in CVC/CVV")
-    void shouldPayByEmptyCVCCVV2() {
-        PageForm.buyOnCredit();
-        PageForm.setCardNumber("444444444444441");
-        PageForm.setCardMonth("07");
-        PageForm.setCardYear("25");
-        PageForm.setCardOwner("Ivan Ivanov");
-        PageForm.setCardCVV("");
-        PageForm.pushContinueButton();
-        PageForm.unSuccessfulPageFilling();
+        pageForm.buyOnMoney();
+        pageForm.setCardNumber(DataHelper.generateApprovedCardNumber());
+        pageForm.setCardMonth(DataHelper.generateRandomValidMonth());
+        pageForm.setCardYear(DataHelper.generateRandomValidYear());
+        pageForm.setCardOwner(DataHelper.generateRandomValidOwnerName());
+        pageForm.setCardCVV(DataHelper.generateEmptyString());
+        pageForm.pushContinueButton();
+        pageForm.unSuccessfulPageFilling();
     }
 }
